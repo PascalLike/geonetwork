@@ -49,13 +49,67 @@
   </issueManagement>
 
   <properties>
+    <!-- Java version -->
     <java.version>21</java.version>
+
+    <!-- Spring Framework versions -->
     <spring-cloud.version>2023.0.2</spring-cloud.version>
+
+    <!-- Database versions -->
+    <postgresql.version>42.7.3</postgresql.version>
+    <h2.version>2.2.224</h2.version>
+
+    <!-- Search/Elasticsearch versions -->
     <es.version>8.14.1</es.version>
+
+    <!-- JSON/Jackson versions -->
     <jackson.version>2.17.0</jackson.version>
+    <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+
+    <!-- Apache Commons versions -->
+    <commons-lang3.version>3.14.0</commons-lang3.version>
+    <commons-exec.version>1.4.0</commons-exec.version>
+    <commons-io.version>1.3.2</commons-io.version>
+    <commons-collections4.version>4.4</commons-collections4.version>
+    <commons-text.version>1.12.0</commons-text.version>
+    <commons-jxpath.version>1.3</commons-jxpath.version>
+
+    <!-- XML Processing versions -->
+    <saxon.version>12.5</saxon.version>
+    <jdom.version>1.1.3</jdom.version>
+    <jaxen.version>2.0.0</jaxen.version>
+    <xml-resolver.version>1.2</xml-resolver.version>
+    <xerces.version>2.12.2</xerces.version>
+
+    <!-- Documentation/API versions -->
+    <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
+
+    <!-- Security versions -->
+    <thymeleaf-extras-springsecurity6.version>3.1.2.RELEASE</thymeleaf-extras-springsecurity6.version>
+
+    <!-- Development/Utility versions -->
+    <lombok.version>1.18.34</lombok.version>
+
+    <!-- Testing versions -->
+    <testcontainers.version>1.20.1</testcontainers.version>
+    <junit-jupiter.version>5.10.3</junit-jupiter.version>
+    <mockito.version>5.11.0</mockito.version>
+
+    <!-- Code quality/Analysis versions -->
     <spotless.version>2.43.0</spotless.version>
-    <lombok.version>1.18.38</lombok.version>
     <errorProne.version>2.38.0</errorProne.version>
+    <spotbugs-annotations.version>4.8.4</spotbugs-annotations.version>
+    <spotbugs-maven-plugin.version>4.8.6.2</spotbugs-maven-plugin.version>
+    <findsecbugs-plugin.version>1.12.0</findsecbugs-plugin.version>
+
+    <!-- Build plugin versions -->
+    <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <license-maven-plugin.version>4.5</license-maven-plugin.version>
+    <sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
+    <openapi-generator-maven-plugin.version>7.7.0</openapi-generator-maven-plugin.version>
+
+    <!-- Code generation versions -->
     <jsonschema2pojo.version>1.2.1</jsonschema2pojo.version>
 
     <!-- build -->
@@ -87,31 +141,31 @@
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
-        <version>1.20.1</version>
+        <version>${testcontainers.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
-        <version>5.10.3</version>
+        <version>${junit-jupiter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.11.0</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.3</version>
+        <version>${postgresql.version}</version>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>2.2.224</version>
+        <version>${h2.version}</version>
       </dependency>
       <dependency>
         <groupId>co.elastic.clients</groupId>
@@ -121,7 +175,7 @@
       <dependency>
         <groupId>org.openapitools</groupId>
         <artifactId>jackson-databind-nullable</artifactId>
-        <version>0.2.6</version>
+        <version>${jackson-databind-nullable.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -131,17 +185,17 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.14.0</version>
+        <version>${commons-lang3.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-exec</artifactId>
-        <version>1.4.0</version>
+        <version>${commons-exec.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>1.3.2</version>
+        <version>${commons-io.version}</version>
       </dependency>
       <dependency>
         <groupId>org.projectlombok</groupId>
@@ -152,54 +206,54 @@
       <dependency>
         <groupId>org.springdoc</groupId>
         <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.6.0</version>
+        <version>${springdoc-openapi.version}</version>
       </dependency>
       <dependency>
         <groupId>org.thymeleaf.extras</groupId>
         <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-        <version>3.1.2.RELEASE</version>
+        <version>${thymeleaf-extras-springsecurity6.version}</version>
       </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>12.5</version>
+        <version>${saxon.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jdom</groupId>
         <artifactId>jdom</artifactId>
-        <version>1.1.3</version>
+        <version>${jdom.version}</version>
       </dependency>
       <!-- Q: Maybe replace by Saxon ? -->
       <dependency>
         <groupId>jaxen</groupId>
         <artifactId>jaxen</artifactId>
-        <version>2.0.0</version>
+        <version>${jaxen.version}</version>
       </dependency>
       <dependency>
         <groupId>xml-resolver</groupId>
         <artifactId>xml-resolver</artifactId>
-        <version>1.2</version>
+        <version>${xml-resolver.version}</version>
       </dependency>
       <dependency>
         <groupId>xerces</groupId>
         <artifactId>xercesImpl</artifactId>
-        <version>2.12.2</version>
+        <version>${xerces.version}</version>
       </dependency>
       <!-- Q: Maybe to replace by Saxon Xpath parser? -->
       <dependency>
         <groupId>commons-jxpath</groupId>
         <artifactId>commons-jxpath</artifactId>
-        <version>1.3</version>
+        <version>${commons-jxpath.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-collections4</artifactId>
-        <version>4.4</version>
+        <version>${commons-collections4.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.12.0</version>
+        <version>${commons-text.version}</version>
       </dependency>
       <dependency>
         <groupId>com.diffplug.spotless</groupId>
@@ -209,7 +263,7 @@
       <dependency>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-annotations</artifactId>
-        <version>4.8.4</version>
+        <version>${spotbugs-annotations.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -219,11 +273,11 @@
       <plugins>
         <plugin>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.4.0</version>
+          <version>${maven-checkstyle-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.13.0</version>
+          <version>${maven-compiler-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>com.diffplug.spotless</groupId>
@@ -233,17 +287,17 @@
         <plugin>
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>4.5</version>
+          <version>${license-maven-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
-          <version>4.8.6.2</version>
+          <version>${spotbugs-maven-plugin.version}</version>
         </plugin>
         <plugin>
           <groupId>com.github.ekryd.sortpom</groupId>
           <artifactId>sortpom-maven-plugin</artifactId>
-          <version>2.15.0</version>
+          <version>${sortpom-maven-plugin.version}</version>
         </plugin>
 
         <plugin>
@@ -752,7 +806,7 @@
                     <plugin>
                       <groupId>com.h3xstream.findsecbugs</groupId>
                       <artifactId>findsecbugs-plugin</artifactId>
-                      <version>1.12.0</version>
+                      <version>${findsecbugs-plugin.version}</version>
                     </plugin>
                   </plugins>
                   <xmlOutput>true</xmlOutput>
