@@ -28,7 +28,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${maven-antrun-plugin.version}</version>
         <executions>
 
           <execution>
@@ -52,7 +52,7 @@
       <!-- package distribution -->
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>${maven-assembly-plugin.version}</version>
         <executions>
           <execution>
             <id>make-assembly</id>

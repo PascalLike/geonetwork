@@ -86,6 +86,7 @@
 
     <!-- Security versions -->
     <thymeleaf-extras-springsecurity6.version>3.1.2.RELEASE</thymeleaf-extras-springsecurity6.version>
+    <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
 
     <!-- Development/Utility versions -->
     <lombok.version>1.18.34</lombok.version>
@@ -94,6 +95,7 @@
     <testcontainers.version>1.20.1</testcontainers.version>
     <junit-jupiter.version>5.10.3</junit-jupiter.version>
     <mockito.version>5.11.0</mockito.version>
+    <guava.version>33.3.1-jre</guava.version>
 
     <!-- Code quality/Analysis versions -->
     <spotless.version>2.43.0</spotless.version>
@@ -105,9 +107,11 @@
     <!-- Build plugin versions -->
     <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+    <maven-assembly-plugin>3.3.0</maven-assembly-plugin>
     <license-maven-plugin.version>4.5</license-maven-plugin.version>
     <sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-    <openapi-generator-maven-plugin.version>7.7.0</openapi-generator-maven-plugin.version>
+    <openapi-generator-maven-plugin.version>7.10.0</openapi-generator-maven-plugin.version>
 
     <!-- Code generation versions -->
     <jsonschema2pojo.version>1.2.1</jsonschema2pojo.version>
