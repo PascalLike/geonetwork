@@ -45,7 +45,7 @@ jobs:
       - name: Tag and Push Docker image
         if: github.event_name == 'push'
         run: |
-          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/gn5-main"
+          IMAGE_NAME="ghcr.io/pascallike/gn5-main"
           
           # Tag with commit SHA
           docker tag gn5-main:${{ github.sha }} ${IMAGE_NAME}:${{ github.sha }}
