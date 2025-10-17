@@ -34,7 +34,7 @@ jobs:
           REGISTRY_USERNAME: ${{ github.actor }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/gn5-main"
+          IMAGE_NAME="ghcr.io/$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')/gn5-main"
           
           mvn spring-boot:build-image \
             -pl src/apps/geonetwork \
