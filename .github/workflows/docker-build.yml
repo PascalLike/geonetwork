@@ -41,21 +41,29 @@ jobs:
       
       - name: Build and Push Multi-arch Docker image
         if: github.event_name == 'push'
+        env:
+          DOCKER_CONFIG: ${{ github.workspace }}/.docker
         run: |
+          # Copy Docker credentials for buildpack to use
+          mkdir -p $DOCKER_CONFIG
+          cp ~/.docker/config.json $DOCKER_CONFIG/config.json
+          
           IMAGE_NAME="ghcr.io/${{ steps.repo.outputs.owner_lc }}/gn5-main"
           
           mvn spring-boot:build-image \
             -pl src/apps/geonetwork \
             -Dspring-boot.build-image.imageName=${IMAGE_NAME}:${{ github.sha }} \
             -Dspring-boot.build-image.platforms=linux/amd64,linux/arm64 \
-            -Dspring-boot.build-image.publish=true
+            -Dspring-boot.build-image.publish=true \
+            -Dspring-boot.build-image.docker.host=unix:///var/run/docker.sock
           
           # Also tag and push as latest
           mvn spring-boot:build-image \
             -pl src/apps/geonetwork \
             -Dspring-boot.build-image.imageName=${IMAGE_NAME}:latest \
             -Dspring-boot.build-image.platforms=linux/amd64,linux/arm64 \
-            -Dspring-boot.build-image.publish=true
+            -Dspring-boot.build-image.publish=true \
+            -Dspring-boot.build-image.docker.host=unix:///var/run/docker.sock
       
       - name: Build Docker image (PR only - single arch)
         if: github.event_name == 'pull_request'
