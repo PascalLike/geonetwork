@@ -6,27 +6,24 @@ package org.geonetwork.ogcapi.service.formatter;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.geonetwork.domain.Source;
 import org.geonetwork.domain.repository.SourceRepository;
 import org.geonetwork.index.model.record.Overview;
-import org.geonetwork.metadata.MetadataManager;
+import org.geonetwork.metadata.IMetadataManager;
 import org.geonetwork.ogcapi.ctrlreturntypes.OgcApiRecordsMultiRecordResponse;
 import org.geonetwork.ogcapi.ctrlreturntypes.OgcApiRecordsSingleRecordResponse;
-import org.geonetwork.setting.SettingManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -37,19 +34,17 @@ import org.springframework.stereotype.Component;
 
 /** Writes `/collections/{catalogId}/items` as an RSS 2.0 feed. */
 @Component
+@RequiredArgsConstructor
 public class RssCollectionMessageWriter implements HttpMessageConverter<OgcApiRecordsMultiRecordResponse> {
 
     private static final MediaType RSS_MEDIA_TYPE = MediaType.valueOf("application/rss+xml");
     private static final DateTimeFormatter RFC_1123_UTC = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC);
 
-    @Autowired
-    private SourceRepository sourceRepository;
+    private final SourceRepository sourceRepository;
+    private final IMetadataManager metadataManager;
 
-    @Autowired
-    private MetadataManager metadataManager;
-
-    @Autowired
-    private SettingManager settingManager;
+    @Value("${geonetwork.url}")
+    String baseUrl;
 
     @Getter
     private final List<MediaType> supportedMediaTypes = List.of(RSS_MEDIA_TYPE);
@@ -88,21 +83,34 @@ public class RssCollectionMessageWriter implements HttpMessageConverter<OgcApiRe
             writer.writeAttribute("version", "2.0");
             writer.writeStartElement("channel");
 
-            var channelLink =
+            String channelLink =
                     source.getJsonLink() == null ? "" : source.getJsonLink().toString();
+            String channelHTMLLink = channelLink.replace("f=json", "f=html");
+            String channelRSSLink = channelLink.replace("f=json", "f=rss");
 
             Optional<Source> collection = sourceRepository.findById(source.getCatalogId());
             var channelName = collection.map(Source::getName).orElse("GeoNetwork RSS");
 
             writeSimpleElement(writer, "title", channelName);
-            writeSimpleElement(writer, "link", channelLink);
+            writeSimpleElement(writer, "link", channelHTMLLink);
             writeSimpleElement(writer, "description", "OGC API Records results for collection " + channelName);
             writeSimpleElement(writer, "lastBuildDate", RFC_1123_UTC.format(Instant.now()));
-            writeSimpleElement(writer, "generator", channelName);
+            writeSimpleElement(writer, "generator", "GeoNetwork OpenSource");
+
+            if (StringUtils.isNotBlank(channelLink)) {
+                writeSimpleElement(
+                        writer,
+                        "atom:link",
+                        null,
+                        Map.of(
+                                "href", channelRSSLink,
+                                "rel", "self",
+                                "type", "application/rss+xml"));
+            }
+
             // TODO: Use Logo API https://github.com/geonetwork/core-geonetwork/pull/9322
             if (collection.isPresent() && collection.get().getLogo() != null) {
-                var logoUrl = settingManager.getBaseUrlWithContextPath() + "/images/harvesting/"
-                        + collection.get().getLogo();
+                var logoUrl = baseUrl + "/images/harvesting/" + collection.get().getLogo();
                 writer.writeStartElement("image");
                 writeSimpleElement(writer, "url", logoUrl);
                 writeSimpleElement(writer, "title", channelName);
@@ -137,10 +145,22 @@ public class RssCollectionMessageWriter implements HttpMessageConverter<OgcApiRe
                 }
 
                 List<Overview> overviewList = indexRecord.getOverview();
-                if (overviewList != null && !overviewList.isEmpty()) {
+                if (overviewList != null
+                        && !overviewList.isEmpty()
+                        && overviewList.getFirst().getUrl() != null) {
+                    var overviewUrl = resolveAbsoluteUrl(overviewList.getFirst().getUrl());
+                    var mimeType = inferImageMimeType(overviewUrl);
+
                     writer.writeStartElement("enclosure");
-                    writer.writeAttribute("url", overviewList.getFirst().getUrl());
-                    writer.writeAttribute("type", "image/png");
+                    writer.writeAttribute("url", overviewUrl);
+                    writer.writeAttribute("length", "0");
+                    writer.writeAttribute("type", mimeType);
+                    writer.writeEndElement();
+
+                    writer.writeStartElement("media:content");
+                    writer.writeAttribute("url", overviewUrl);
+                    writer.writeAttribute("type", mimeType);
+                    writer.writeAttribute("medium", "image");
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();
@@ -154,6 +174,23 @@ public class RssCollectionMessageWriter implements HttpMessageConverter<OgcApiRe
         } catch (Exception e) {
             throw new IOException("Error writing RSS response", e);
         }
+    }
+
+    private String resolveAbsoluteUrl(String url) {
+        if (url == null || url.isBlank() || url.startsWith("http://") || url.startsWith("https://")) {
+            return url;
+        }
+        return url.startsWith("/") ? baseUrl + url : baseUrl + "/" + url;
+    }
+
+    private static String inferImageMimeType(String url) {
+        if (url == null) return "image/png";
+        var lower = url.toLowerCase(Locale.ROOT);
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".svg")) return "image/svg+xml";
+        if (lower.endsWith(".webp")) return "image/webp";
+        return "image/png";
     }
 
     private static String getLocalizedValue(Map<String, String> multilingual, String fallback) {
@@ -171,47 +208,8 @@ public class RssCollectionMessageWriter implements HttpMessageConverter<OgcApiRe
     }
 
     private static String toRfc1123Date(String... candidates) {
-        if (candidates == null) {
-            return null;
-        }
-        for (var candidate : candidates) {
-            var parsed = parseInstant(candidate);
-            if (parsed != null) {
-                return RFC_1123_UTC.format(parsed);
-            }
-        }
-        return null;
-    }
-
-    private static Instant parseInstant(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return Instant.parse(value);
-        } catch (Exception e) {
-            // Continue with other supported date shapes.
-        }
-        try {
-            return OffsetDateTime.parse(value).toInstant();
-        } catch (Exception e) {
-            // Continue with other supported date shapes.
-        }
-        try {
-            return ZonedDateTime.parse(value).toInstant();
-        } catch (Exception e) {
-            // Continue with other supported date shapes.
-        }
-        try {
-            return LocalDateTime.parse(value).toInstant(ZoneOffset.UTC);
-        } catch (Exception e) {
-            // Continue with other supported date shapes.
-        }
-        try {
-            return LocalDate.parse(value).atStartOfDay().toInstant(ZoneOffset.UTC);
-        } catch (Exception e) {
-            return null;
-        }
+        var parsed = IndexRecordDates.firstParseable(candidates);
+        return parsed == null ? null : RFC_1123_UTC.format(parsed);
     }
 
     private static void writeSimpleElement(XMLStreamWriter writer, String elementName, String value) throws Exception {

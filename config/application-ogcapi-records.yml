@@ -87,6 +87,14 @@ geonetwork:
             - facetName: topic
               facetType: TERM
               bucketCount: 25
+        - ogcProperty: status
+          elasticProperty: cl_status.key
+          indexRecordProperty: codelists.["cl_status"].[*].properties.["key"]
+          typeOverride: LIST_STRING
+          isQueryable: true
+          facetsConfig:
+            - facetName: status
+              facetType: TERM
         - ogcProperty: creationYearForResource
           elasticProperty: creationYearForResource
           indexRecordProperty: resourceDateDetails.["creationYearForResource"].[0]
@@ -153,6 +161,11 @@ geonetwork:
           elasticProperty: popularity
           indexRecordProperty: popularity
           isSortable: true
+        - ogcProperty: childUuid
+          elasticProperty: childUuid
+          indexRecordProperty: childUuid
+          typeOverride: LIST_STRING
+          isQueryable: true
         - ogcProperty: orgForResource
           elasticProperty: OrgForResourceObject.default
           indexRecordProperty: orgForResourceByRole.["OrgForResourceObject"].[*].["default"]

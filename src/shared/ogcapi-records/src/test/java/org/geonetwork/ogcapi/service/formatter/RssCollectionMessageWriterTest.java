@@ -19,7 +19,6 @@ import org.geonetwork.index.model.record.IndexRecord;
 import org.geonetwork.metadata.MetadataManager;
 import org.geonetwork.ogcapi.ctrlreturntypes.OgcApiRecordsMultiRecordResponse;
 import org.geonetwork.ogcapi.ctrlreturntypes.OgcApiRecordsSingleRecordResponse;
-import org.geonetwork.setting.SettingManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,9 +37,6 @@ class RssCollectionMessageWriterTest {
 
     @Mock
     MetadataManager metadataManager;
-
-    @Mock
-    SettingManager settingManager;
 
     @InjectMocks
     RssCollectionMessageWriter writer;
@@ -84,10 +80,11 @@ class RssCollectionMessageWriterTest {
                 <rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
                   <channel>
                     <title>GeoNetwork OGC API Records - main</title>
-                    <link>https://example.org/ogcapi-records/collections/main/items?f=json</link>
+                    <link>https://example.org/ogcapi-records/collections/main/items?f=html</link>
                     <description>OGC API Records results for collection GeoNetwork OGC API Records - main</description>
                     <lastBuildDate>IGNORED</lastBuildDate>
-                    <generator>GeoNetwork OGC API Records - main</generator>
+                    <generator>GeoNetwork OpenSource</generator>
+                    <atom:link href="https://example.org/ogcapi-records/collections/main/items?f=rss" rel="self" type="application/rss+xml"/>
                     <item>
                       <title>Record &lt;1&gt;</title>
                       <link>https://example.org/ogcapi-records/collections/main/items/record-1?f=geojson</link>
