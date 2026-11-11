@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    EEA-specific OGC API Records fields/facets (#237, #255, #256, #257).
+
+    The "eea-" prefix keeps these files sorted after upstream's numbered changesets,
+    so upstream merges don't clash with them.
+
+    The inserts are idempotent, so on instances where db/add_custom_fields.sql was already
+    applied the changeSet runs as a no-op and is just recorded as executed.
+    If the property-mapping config doesn't exist yet (fresh install, seeded from yml on
+    first boot) the changeSet is skipped without being recorded and retried on next start.
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="eea-00001-ogcapi-reporting-obligations" author="eea">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM ogcapi_property_mapping WHERE id = 'property-mapping'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO ogcapi_field_mapping
+                (config_id, sort_order, ogc_property, elastic_property, index_record_property,
+                 type_override, is_sortable, is_queryable, add_property_to_output)
+            SELECT 'property-mapping',
+                   (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM ogcapi_field_mapping WHERE config_id = 'property-mapping'),
+                   'reportingObligations', 'th_rod-eionet-europa-eu.default',
+                   'keywordByThesaurus.["th_rod-eionet-europa-eu"].[*].properties.["default"]',
+                   'LIST_STRING', false, true, true
+            WHERE NOT EXISTS (SELECT 1 FROM ogcapi_field_mapping
+                              WHERE config_id = 'property-mapping' AND ogc_property = 'reportingObligations');
+
+            INSERT INTO ogcapi_facet_config
+                (field_mapping_id, sort_order, facet_name, facet_type, bucket_sorting, bucket_sorting_direction,
+                 bucket_count, minimum_document_count)
+            SELECT fm.id, 0, 'reportingObligations', 'TERM', 'COUNT', 'DESCENDING', 150, 1
+            FROM ogcapi_field_mapping fm
+            WHERE fm.config_id = 'property-mapping' AND fm.ogc_property = 'reportingObligations'
+              AND NOT EXISTS (SELECT 1 FROM ogcapi_facet_config fc
+                              WHERE fc.field_mapping_id = fm.id AND fc.facet_name = 'reportingObligations');
+        </sql>
+    </changeSet>
+
+    <changeSet id="eea-00001-ogcapi-eea-topics" author="eea">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM ogcapi_property_mapping WHERE id = 'property-mapping'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO ogcapi_field_mapping
+                (config_id, sort_order, ogc_property, elastic_property, index_record_property,
+                 type_override, is_sortable, is_queryable, add_property_to_output)
+            SELECT 'property-mapping',
+                   (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM ogcapi_field_mapping WHERE config_id = 'property-mapping'),
+                   'eeaTopics', 'th_eea-topics.default',
+                   'keywordByThesaurus.["th_eea-topics"].[*].properties.["default"]',
+                   'LIST_STRING', false, true, true
+            WHERE NOT EXISTS (SELECT 1 FROM ogcapi_field_mapping
+                              WHERE config_id = 'property-mapping' AND ogc_property = 'eeaTopics');
+
+            INSERT INTO ogcapi_facet_config
+                (field_mapping_id, sort_order, facet_name, facet_type, bucket_sorting, bucket_sorting_direction,
+                 bucket_count, minimum_document_count)
+            SELECT fm.id, 0, 'eeaTopics', 'TERM', 'COUNT', 'DESCENDING', 50, 1
+            FROM ogcapi_field_mapping fm
+            WHERE fm.config_id = 'property-mapping' AND fm.ogc_property = 'eeaTopics'
+              AND NOT EXISTS (SELECT 1 FROM ogcapi_facet_config fc
+                              WHERE fc.field_mapping_id = fm.id AND fc.facet_name = 'eeaTopics');
+        </sql>
+    </changeSet>
+
+    <changeSet id="eea-00001-ogcapi-gemet-keywords" author="eea">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM ogcapi_property_mapping WHERE id = 'property-mapping'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO ogcapi_field_mapping
+                (config_id, sort_order, ogc_property, elastic_property, index_record_property,
+                 type_override, is_sortable, is_queryable, add_property_to_output)
+            SELECT 'property-mapping',
+                   (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM ogcapi_field_mapping WHERE config_id = 'property-mapping'),
+                   'gemetKeywords', 'th_gemet_tree.default',
+                   'keywordHierarchyByThesaurus.["th_gemet_tree"].defaultTexts',
+                   'LIST_STRING', false, true, true
+            WHERE NOT EXISTS (SELECT 1 FROM ogcapi_field_mapping
+                              WHERE config_id = 'property-mapping' AND ogc_property = 'gemetKeywords');
+
+            INSERT INTO ogcapi_facet_config
+                (field_mapping_id, sort_order, facet_name, facet_type, bucket_sorting, bucket_sorting_direction,
+                 bucket_count, minimum_document_count)
+            SELECT fm.id, 0, 'gemetKeywords', 'TERM', 'COUNT', 'DESCENDING', 500, 1
+            FROM ogcapi_field_mapping fm
+            WHERE fm.config_id = 'property-mapping' AND fm.ogc_property = 'gemetKeywords'
+              AND NOT EXISTS (SELECT 1 FROM ogcapi_facet_config fc
+                              WHERE fc.field_mapping_id = fm.id AND fc.facet_name = 'gemetKeywords');
+        </sql>
+    </changeSet>
+
+    <changeSet id="eea-00001-ogcapi-eea-business-domain" author="eea">
+        <preConditions onFail="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM ogcapi_property_mapping WHERE id = 'property-mapping'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO ogcapi_field_mapping
+                (config_id, sort_order, ogc_property, elastic_property, index_record_property,
+                 type_override, is_sortable, is_queryable, add_property_to_output)
+            SELECT 'property-mapping',
+                   (SELECT COALESCE(MAX(sort_order), -1) + 1 FROM ogcapi_field_mapping WHERE config_id = 'property-mapping'),
+                   'eeaBusinessDomain', 'th_eea-business-domains_tree.default',
+                   'keywordHierarchyByThesaurus.["th_eea-business-domains_tree"].defaultTexts',
+                   'LIST_STRING', false, true, true
+            WHERE NOT EXISTS (SELECT 1 FROM ogcapi_field_mapping
+                              WHERE config_id = 'property-mapping' AND ogc_property = 'eeaBusinessDomain');
+
+            INSERT INTO ogcapi_facet_config (field_mapping_id, sort_order, facet_name, facet_type, bucket_count)
+            SELECT fm.id, 0, 'eeaBusinessDomain', 'TERM', 50
+            FROM ogcapi_field_mapping fm
+            WHERE fm.config_id = 'property-mapping' AND fm.ogc_property = 'eeaBusinessDomain'
+              AND NOT EXISTS (SELECT 1 FROM ogcapi_facet_config fc
+                              WHERE fc.field_mapping_id = fm.id AND fc.facet_name = 'eeaBusinessDomain');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
